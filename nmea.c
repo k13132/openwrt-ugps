@@ -52,7 +52,7 @@ struct nmea_param {
 } nmea_params[MAX_NMEA_PARAM];
 
 static int nmea_bad_time;
-char longitude[33] = { 0 }, latitude[33] = { 0 }, course[17] = { 0 }, speed[17] = { 0 }, elevation[17] = { 0 }, satellites[3] = { 0 }, hdop[5] = { 0 };
+char longitude[33] = { 0 }, latitude[33] = { 0 }, course[17] = { 0 }, speed[17] = { 0 }, elevation[17] = { 0 }, satellites[3] = { 0 }, hdop[5] = { 0 }, pdop[5] = { 0 }, vdop[5] = { 0 };
 int gps_valid = 0;
 
 static void
@@ -157,10 +157,8 @@ nmea_gga_cb(void)
 	if (!gps_valid)
 		return;
 	strncpy(satellites, nmea_params[7].str, sizeof(satellites));
-	strncpy(hdop, nmea_params[8].str, sizeof(hdop));
 	strncpy(elevation, nmea_params[9].str, sizeof(elevation));
 	DEBUG(4, "satellites: %s\n", satellites);
-	DEBUG(4, "HDOP: %s\n", hdop);
 	DEBUG(4, "height: %s\n", elevation);
 }
 
@@ -173,6 +171,19 @@ nmea_vtg_cb(void)
 	strncpy(speed, nmea_params[7].str, sizeof(speed));
 	DEBUG(4, "course: %s\n", course);
 	DEBUG(4, "speed: %s\n", speed);
+}
+
+static void
+nmea_gsa_cb(void)
+{
+	if (!gps_valid)
+		return;
+	strncpy(pdop, nmea_params[15].str, sizeof(pdop));
+	strncpy(hdop, nmea_params[16].str, sizeof(hdop));
+	strncpy(vdop, nmea_params[17].str, sizeof(vdop));
+	DEBUG(4, "PDOP: %s\n", pdop);
+	DEBUG(4, "HDOP: %s\n", hdop);
+	DEBUG(4, "VDOP: %s\n", vdop);
 }
 
 static struct nmea_msg {
@@ -196,6 +207,10 @@ static struct nmea_msg {
 		.msg = "VTG",
 		.cnt = 9,
 		.handler = nmea_vtg_cb,
+	}, {
+		.msg = "GSA",
+		.cnt = 17,
+		.handler = nmea_gsa_cb,
 	},
 };
 
