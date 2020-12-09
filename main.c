@@ -33,7 +33,7 @@ static struct ubus_auto_conn conn;
 static struct blob_buf b;
 static char *ubus_socket;
 struct timespec stamp = { 0 };
-unsigned int adjust_clock = 0;
+unsigned int adjust_clock = 0, show_extended = 0;
 
 void
 gps_timestamp(void)
@@ -61,10 +61,12 @@ gps_info(struct ubus_context *ctx, struct ubus_object *obj,
 		blobmsg_add_string(&b, "elevation", elevation);
 		blobmsg_add_string(&b, "course", course);
 		blobmsg_add_string(&b, "speed", speed);
-		blobmsg_add_string(&b, "satellites", satellites);
-		blobmsg_add_string(&b, "PDOP", pdop);
-		blobmsg_add_string(&b, "HDOP", hdop);
-		blobmsg_add_string(&b, "VDOP", vdop);
+		if (show_extended) {
+			blobmsg_add_string(&b, "satellites", satellites);
+			blobmsg_add_string(&b, "PDOP", pdop);
+			blobmsg_add_string(&b, "HDOP", hdop);
+			blobmsg_add_string(&b, "VDOP", vdop);
+		}
 	}
 	ubus_send_reply(ctx, req, b.head);
 
@@ -103,6 +105,7 @@ usage(const char *prog)
 		"	-a		Adjust system clock from gps\n"
 		"	-s <path>	Path to ubus socket\n"
 		"	-d <level>	Enable debug messages\n"
+		"	-e		Show extended gps information\n"
 		"	-S		Print messages to stdout\n"
 		"\n", prog);
 	return -1;
@@ -123,7 +126,7 @@ main(int argc, char ** argv)
 		unsetenv("DBGLVL");
 	}
 
-	while ((ch = getopt(argc, argv, "ad:s:S")) != -1) {
+	while ((ch = getopt(argc, argv, "ad:s:S:e")) != -1) {
 		switch (ch) {
 		case 'a':
 			adjust_clock = -1;
@@ -136,6 +139,9 @@ main(int argc, char ** argv)
 			break;
 		case 'S':
 			ulog_channels = ULOG_STDIO;
+			break;
+		case 'e':
+			show_extended = -1;
 			break;
 		default:
 			return usage(argv[0]);

@@ -132,9 +132,9 @@ nmea_rmc_cb(void)
 
 		degrees = floor(lat / 100.0);
 		minutes = lat - (degrees * 100.0);
-	        lat = degrees + minutes / 60.0;
+		lat = degrees + minutes / 60.0;
 
-	        degrees = floor(lon / 100.0);
+		degrees = floor(lon / 100.0);
 		minutes = lon - (degrees * 100.0);
 		lon = degrees + minutes / 60.0;
 
