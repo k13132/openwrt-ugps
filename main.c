@@ -61,6 +61,8 @@ gps_info(struct ubus_context *ctx, struct ubus_object *obj,
 		blobmsg_add_string(&b, "elevation", elevation);
 		blobmsg_add_string(&b, "course", course);
 		blobmsg_add_string(&b, "speed", speed);
+		blobmsg_add_string(&b, "satellites", satellites);
+		blobmsg_add_string(&b, "HDOP", hdop);
 	}
 	ubus_send_reply(ctx, req, b.head);
 
